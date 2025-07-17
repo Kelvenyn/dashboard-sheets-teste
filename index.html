@@ -1,439 +1,396 @@
 <html lang="pt-BR"><head><style data-merge-styles="true"></style>
     <style data-merge-styles="true"></style><meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Integração Google Sheets</title>
+    <title>Dashboard Google Sheets</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', 'Trebuchet MS', sans-serif; }
-        .card-shadow { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
-        .hover-lift { transition: all 0.3s ease; }
-        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); }
-        .spinner { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .pulse-success { animation: pulseSuccess 0.6s ease-out; }
-        @keyframes pulseSuccess { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        body { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .code-container { max-height: 600px; overflow-y: auto; }
     </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-0\.5{margin-top:0.125rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.max-h-96{max-height:24rem}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-6xl{max-width:72rem}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-8{gap:2rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-auto{overflow:auto}.whitespace-pre-wrap{white-space:pre-wrap}.break-all{word-break:break-all}.rounded-2xl{border-radius:1rem}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.rounded-r-xl{border-top-right-radius:0.75rem;border-bottom-right-radius:0.75rem}.border{border-width:1px}.border-l-4{border-left-width:4px}.border-amber-400{--tw-border-opacity:1;border-color:rgb(251 191 36 / var(--tw-border-opacity, 1))}.border-blue-400{--tw-border-opacity:1;border-color:rgb(96 165 250 / var(--tw-border-opacity, 1))}.border-green-400{--tw-border-opacity:1;border-color:rgb(74 222 128 / var(--tw-border-opacity, 1))}.border-purple-400{--tw-border-opacity:1;border-color:rgb(192 132 252 / var(--tw-border-opacity, 1))}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-green-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-orange-500{--tw-bg-opacity:1;background-color:rgb(249 115 22 / var(--tw-bg-opacity, 1))}.bg-purple-50{--tw-bg-opacity:1;background-color:rgb(250 245 255 / var(--tw-bg-opacity, 1))}.bg-purple-600{--tw-bg-opacity:1;background-color:rgb(147 51 234 / var(--tw-bg-opacity, 1))}.bg-slate-600{--tw-bg-opacity:1;background-color:rgb(71 85 105 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-slate-50{--tw-gradient-from:#f8fafc var(--tw-gradient-from-position);--tw-gradient-to:rgb(248 250 252 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-blue-50{--tw-gradient-to:#eff6ff var(--tw-gradient-to-position)}.p-6{padding:1.5rem}.p-1{padding:0.25rem}.p-4{padding:1rem}.p-8{padding:2rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.text-left{text-align:left}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-amber-800{--tw-text-opacity:1;color:rgb(146 64 14 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-green-400{--tw-text-opacity:1;color:rgb(74 222 128 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-green-800{--tw-text-opacity:1;color:rgb(22 101 52 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-orange-600{--tw-text-opacity:1;color:rgb(234 88 12 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-purple-800{--tw-text-opacity:1;color:rgb(107 33 168 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-green-700:hover{--tw-bg-opacity:1;background-color:rgb(21 128 61 / var(--tw-bg-opacity, 1))}.hover\:bg-orange-600:hover{--tw-bg-opacity:1;background-color:rgb(234 88 12 / var(--tw-bg-opacity, 1))}.hover\:bg-purple-700:hover{--tw-bg-opacity:1;background-color:rgb(126 34 206 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:text-slate-800:hover{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.focus\:border-transparent:focus{border-color:transparent}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}@media (min-width: 1024px){.lg\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}</style></head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen p-6">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-slate-800 mb-2">Dashboard Google Sheets</h1>
-            <p class="text-slate-600 text-lg">Interface de teste para integração com planilhas</p>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="flex justify-center mb-8">
-            <div class="bg-white rounded-xl p-1 card-shadow">
-                <button id="dashboardTab" class="px-6 py-3 rounded-lg font-medium transition-all duration-200 text-slate-600">
-                    <span class="material-icons text-sm mr-2">dashboard</span>
-                    Dashboard
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-2{margin-left:0.5rem}.ml-3{margin-left:0.75rem}.mt-2{margin-top:0.5rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.h-4{height:1rem}.min-h-screen{min-height:100vh}.w-4{width:1rem}.w-full{width:100%}.min-w-full{min-width:100%}.max-w-7xl{max-width:80rem}.flex-shrink-0{flex-shrink:0}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-8{gap:2rem}.space-x-8 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(2rem * var(--tw-space-x-reverse));margin-left:calc(2rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-gray-200 > :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(229 231 235 / var(--tw-divide-opacity, 1))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-blue-200{--tw-border-opacity:1;border-color:rgb(191 219 254 / var(--tw-border-opacity, 1))}.border-blue-500{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-green-200{--tw-border-opacity:1;border-color:rgb(187 247 208 / var(--tw-border-opacity, 1))}.border-transparent{border-color:transparent}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-green-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-purple-600{--tw-bg-opacity:1;background-color:rgb(147 51 234 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-600{--tw-bg-opacity:1;background-color:rgb(202 138 4 / var(--tw-bg-opacity, 1))}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.text-left{text-align:left}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.tracking-wider{letter-spacing:0.05em}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.text-green-400{--tw-text-opacity:1;color:rgb(74 222 128 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-green-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-green-800{--tw-text-opacity:1;color:rgb(22 101 52 / var(--tw-text-opacity, 1))}.text-orange-600{--tw-text-opacity:1;color:rgb(234 88 12 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-50:hover{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.hover\:bg-green-700:hover{--tw-bg-opacity:1;background-color:rgb(21 128 61 / var(--tw-bg-opacity, 1))}.hover\:bg-purple-700:hover{--tw-bg-opacity:1;background-color:rgb(126 34 206 / var(--tw-bg-opacity, 1))}.hover\:bg-yellow-700:hover{--tw-bg-opacity:1;background-color:rgb(161 98 7 / var(--tw-bg-opacity, 1))}.hover\:text-gray-700:hover{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.focus\:border-blue-500:focus{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}@media (min-width: 640px){.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}}@media (min-width: 1024px){.lg\:col-span-1{grid-column:span 1 / span 1}.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style></head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Tabs -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex space-x-8">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500">
+                    🔗 Dashboard
                 </button>
-                <button id="codeTab" class="px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:text-slate-800 bg-blue-600 text-white">
-                    <span class="material-icons text-sm mr-2">code</span>
-                    Código Fonte
+                <button onclick="switchTab('source')" id="tab-source" class="tab-btn py-4 px-1 border-b-2 hover:text-gray-700 font-medium text-sm border-blue-500 text-blue-600">
+                    💻 Código Fonte
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- Dashboard Content -->
-        <div id="dashboardContent" class="hidden">
-            <!-- Main Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
-            <!-- Left Column -->
-            <div class="space-y-6">
-                
-                <!-- Connect Sheet Card -->
-                <div class="bg-white rounded-2xl p-8 card-shadow hover-lift">
-                    <div class="flex items-center mb-6">
-                        <span class="material-icons text-green-600 text-3xl mr-3">link</span>
-                        <h2 class="text-2xl font-semibold text-slate-800">Conectar Planilha</h2>
+    <!-- Dashboard Tab -->
+    <div id="dashboard-content" class="tab-content fade-in">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">🔗 Conexão com Google Sheets</h1>
+                <p class="text-gray-600">Teste de integração com planilha pública</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Data Table -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h2 class="text-lg font-semibold text-gray-900">📊 Dados da Planilha</h2>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Indicador</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observação</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="data-table"><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">João Silva</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Vendas</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">500</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Meta atingida</td></tr><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Maria Santos</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Marketing</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">200</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Conversão</td></tr><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Pedro Costa</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Suporte</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">300</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Satisfação</td></tr><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Ana Oliveira</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Produção</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">400</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Acima da meta</td></tr></tbody>
+                            </table>
+                        </div>
                     </div>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">
+                </div>
+
+                <!-- Connection Panel -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">⚙️ Painel de Conexão</h2>
+                        
+                        <!-- URL Input -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 🔗 Cole aqui o link público do Google Sheets
                             </label>
-                            <input type="url" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                            <p class="text-xs text-amber-600 mt-2 flex items-center">
-                                <span class="material-icons text-sm mr-1">warning</span>
-                                Atenção: a planilha deve estar com compartilhamento público ou com permissão para visualização.
-                            </p>
+                            <input type="url" id="sheets-url" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                         </div>
 
                         <!-- Radio Options -->
-                        <div class="space-y-3">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="importMode" value="replace" checked="" class="mr-3 text-blue-600">
-                                <span class="text-slate-700">⭘ Substituir os dados existentes</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="importMode" value="append" class="mr-3 text-blue-600">
-                                <span class="text-slate-700">⭘ Adicionar aos dados atuais</span>
-                            </label>
+                        <div class="mb-6">
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="import-mode" value="replace" checked="" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <span class="ml-2 text-sm text-gray-700">Substituir os dados existentes</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="import-mode" value="append" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <span class="ml-2 text-sm text-gray-700">Adicionar aos dados atuais</span>
+                                </label>
+                            </div>
                         </div>
 
-                        <!-- Import Button -->
-                        <button id="importBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 hover-lift">
-                            <span class="material-icons">download</span>
-                            <span>IMPORTAR DADOS</span>
-                        </button>
-
-                        <!-- Status Message -->
-                        <div id="importStatus" class="hidden"></div>
-
-                        <p class="text-xs text-slate-500 text-center">
-                            Atualize os dados manualmente sempre que houver alterações na planilha.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- View Sheet Card -->
-                <div class="bg-white rounded-2xl p-8 card-shadow hover-lift">
-                    <div class="flex items-center mb-6">
-                        <span class="material-icons text-blue-600 text-3xl mr-3">visibility</span>
-                        <h2 class="text-2xl font-semibold text-slate-800">Visualizar Planilha</h2>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <button id="openSheetBtn" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 hover-lift" title="Clique para abrir no navegador">
-                            <span class="material-icons">search</span>
-                            <span>ABRIR PLANILHA</span>
-                        </button>
-                        
-                        <div id="connectedSheet" class="hidden">
-                            <p class="text-sm text-slate-600">
-                                <span class="font-medium">Link conectado:</span>
-                                <span id="connectedUrl" class="text-blue-600 break-all"></span>
-                            </p>
+                        <!-- Action Buttons -->
+                        <div class="space-y-3 mb-6">
+                            <button onclick="importData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center justify-center">
+                                📥 IMPORTAR DADOS
+                            </button>
+                            <button onclick="updateData()" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center justify-center">
+                                🔄 ATUALIZAR
+                            </button>
+                            <button onclick="testConnection()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center justify-center">
+                                🧪 TESTAR CONEXÃO
+                            </button>
+                            <button onclick="viewSheet()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center justify-center">
+                                🔍 VISUALIZAR PLANILHA
+                            </button>
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Right Column -->
-            <div class="space-y-6">
-                
-                <!-- Update Data Card -->
-                <div class="bg-white rounded-2xl p-8 card-shadow hover-lift">
-                    <div class="flex items-center mb-6">
-                        <span class="material-icons text-orange-600 text-3xl mr-3">refresh</span>
-                        <h2 class="text-2xl font-semibold text-slate-800">Atualizar Dados</h2>
-                    </div>
-                    
-                    <button id="updateBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 hover-lift" title="Reimportar os dados da planilha atual">
-                        <span class="material-icons">sync</span>
-                        <span>ATUALIZAR DADOS</span>
-                    </button>
-                    
-                    <div id="updateStatus" class="hidden mt-4"></div>
-                </div>
+                        <!-- Status Area -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                            <textarea id="status-area" readonly="" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm" placeholder="Mensagens de status aparecerão aqui..."></textarea>
+                        </div>
 
-                <!-- Test Connection Card -->
-                <div class="bg-white rounded-2xl p-8 card-shadow hover-lift">
-                    <div class="flex items-center mb-6">
-                        <span class="material-icons text-purple-600 text-3xl mr-3">science</span>
-                        <h2 class="text-2xl font-semibold text-slate-800">Testar Conexão</h2>
-                    </div>
-                    
-                    <button id="testBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 hover-lift">
-                        <span class="material-icons">science</span>
-                        <span>TESTAR CONEXÃO</span>
-                    </button>
-                    
-                    <div id="testStatus" class="hidden mt-4"></div>
-                </div>
-
-                <!-- Help Section -->
-                <div class="bg-white rounded-2xl p-8 card-shadow hover-lift">
-                    <button id="helpToggle" class="flex items-center justify-between w-full text-left">
-                        <div class="flex items-center">
-                            <span class="material-icons text-indigo-600 text-3xl mr-3">info</span>
-                            <h2 class="text-2xl font-semibold text-slate-800">Ajuda e Dicas</h2>
-                        </div>
-                        <span id="helpIcon" class="material-icons text-slate-400 transition-transform duration-200">expand_more</span>
-                    </button>
-                    
-                    <div id="helpContent" class="hidden mt-6 space-y-4">
-                        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-xl">
-                            <p class="text-sm text-green-800 flex items-start">
-                                <span class="material-icons text-green-600 text-sm mr-2 mt-0.5">check_circle</span>
-                                Certifique-se que a planilha esteja configurada como "Qualquer pessoa com o link pode visualizar"
-                            </p>
-                        </div>
-                        
-                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-xl">
-                            <p class="text-sm text-blue-800 flex items-start">
-                                <span class="material-icons text-blue-600 text-sm mr-2 mt-0.5">check_circle</span>
-                                O intervalo de dados deve começar na célula A1
-                            </p>
-                        </div>
-                        
-                        <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl">
-                            <p class="text-sm text-amber-800 flex items-start">
-                                <span class="material-icons text-amber-600 text-sm mr-2 mt-0.5">check_circle</span>
-                                Evite fórmulas complexas ou células mescladas
-                            </p>
-                        </div>
-                        
-                        <div class="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-xl">
-                            <p class="text-sm text-purple-800 flex items-start">
-                                <span class="material-icons text-purple-600 text-sm mr-2 mt-0.5">check_circle</span>
-                                Após editar a planilha, clique em "ATUALIZAR DADOS" para sincronizar
+                        <!-- Info Note -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+                            <p class="text-xs text-blue-700">
+                                💡 <strong>Dica:</strong> A planilha deve estar com permissão pública para leitura
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
+    </div>
 
-        <!-- Code Source Content -->
-        <div id="codeContent" class="block">
-            <div class="bg-white rounded-2xl p-8 card-shadow">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center">
-                        <span class="material-icons text-blue-600 text-3xl mr-3">code</span>
-                        <h2 class="text-2xl font-semibold text-slate-800">Código Fonte Completo</h2>
-                    </div>
-                    <button id="copyCodeBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 flex items-center space-x-2 hover-lift" title="Copiar código para área de transferência">
-                        <span class="material-icons text-sm">content_copy</span>
-                        <span>Copiar Código</span>
+    <!-- Source Code Tab -->
+    <div id="source-content" class="tab-content active">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">📄 Código Fonte</h1>
+                <p class="text-gray-600">Visualize e copie o HTML do dashboard</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-gray-900">HTML Source Code</h2>
+                    <button onclick="copyCode()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center">
+                        📋 Copiar código
                     </button>
                 </div>
-                
-                <div class="bg-slate-900 rounded-xl p-6 overflow-auto max-h-96">
-                    <pre id="sourceCode" class="text-sm text-green-400 font-mono whitespace-pre-wrap"></pre>
+                <div class="code-container">
+                    <pre id="source-code" class="p-6 text-sm text-gray-800 bg-gray-50 overflow-x-auto"><code></code></pre>
                 </div>
-                
-                <div id="copyStatus" class="hidden mt-4"></div>
-                
-                <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-xl">
-                    <p class="text-sm text-blue-800 flex items-start">
-                        <span class="material-icons text-blue-600 text-sm mr-2 mt-0.5">info</span>
-                        Este é o código fonte completo da página. Você pode copiá-lo e salvá-lo como arquivo .html para usar em seus projetos.
-                    </p>
+            </div>
+
+            <!-- Info Box -->
+            <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <span class="text-green-400 text-xl">💡</span>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800">Como usar este código</h3>
+                        <div class="mt-2 text-sm text-green-700">
+                            <p>Você pode salvar esse código como <code class="bg-green-100 px-1 rounded">index.html</code> e publicar em um servidor estático como GitHub Pages, Netlify ou Vercel.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Global variables
-        let connectedSheetUrl = '';
-        
-        // Source code content
-        const sourceCodeContent = <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Integração Google Sheets</title>
-    <script src="https://cdn.tailwindcss.com"><\/script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', 'Trebuchet MS', sans-serif; }
-        .card-shadow { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
-        .hover-lift { transition: all 0.3s ease; }
-        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); }
-        .spinner { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .pulse-success { animation: pulseSuccess 0.6s ease-out; }
-        @keyframes pulseSuccess { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-    </style>
-</head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen p-6">
-    <!-- Conteúdo completo da página aqui -->
-</body>
-</html>;
-
         // Tab switching functionality
-        document.getElementById('dashboardTab').addEventListener('click', function() {
-            // Switch to dashboard
-            document.getElementById('dashboardContent').classList.remove('hidden');
-            document.getElementById('dashboardContent').classList.add('block');
-            document.getElementById('codeContent').classList.remove('block');
-            document.getElementById('codeContent').classList.add('hidden');
-            
-            // Update tab styles
-            this.classList.add('bg-blue-600', 'text-white');
-            this.classList.remove('text-slate-600');
-            document.getElementById('codeTab').classList.remove('bg-blue-600', 'text-white');
-            document.getElementById('codeTab').classList.add('text-slate-600');
-        });
-
-        document.getElementById('codeTab').addEventListener('click', function() {
-            // Switch to code view
-            document.getElementById('codeContent').classList.remove('hidden');
-            document.getElementById('codeContent').classList.add('block');
-            document.getElementById('dashboardContent').classList.remove('block');
-            document.getElementById('dashboardContent').classList.add('hidden');
-            
-            // Update tab styles
-            this.classList.add('bg-blue-600', 'text-white');
-            this.classList.remove('text-slate-600');
-            document.getElementById('dashboardTab').classList.remove('bg-blue-600', 'text-white');
-            document.getElementById('dashboardTab').classList.add('text-slate-600');
-            
-            // Load source code
-            loadSourceCode();
-        });
-
-        // Copy code functionality
-        document.getElementById('copyCodeBtn').addEventListener('click', function() {
-            const sourceCode = document.getElementById('sourceCode').textContent;
-            const statusDiv = document.getElementById('copyStatus');
-            
-            navigator.clipboard.writeText(sourceCode).then(() => {
-                showStatus(statusDiv, '✅ Código copiado para a área de transferência!', 'success');
-                this.innerHTML = '<span class="material-icons text-sm">check</span><span>Copiado!</span>';
-                
-                setTimeout(() => {
-                    this.innerHTML = '<span class="material-icons text-sm">content_copy</span><span>Copiar Código</span>';
-                }, 2000);
-            }).catch(() => {
-                showStatus(statusDiv, '❌ Erro ao copiar código', 'error');
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
             });
-        });
-
-        // Load source code function
-        function loadSourceCode() {
-            const sourceCodeElement = document.getElementById('sourceCode');
-            const fullSourceCode = document.documentElement.outerHTML;
-            sourceCodeElement.textContent = fullSourceCode;
+            
+            // Remove active state from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-content').classList.add('active');
+            
+            // Activate selected tab button
+            const activeTab = document.getElementById('tab-' + tabName);
+            activeTab.classList.remove('border-transparent', 'text-gray-500');
+            activeTab.classList.add('border-blue-500', 'text-blue-600');
+            
+            // Load source code when switching to source tab
+            if (tabName === 'source') {
+                loadSourceCode();
+            }
         }
 
-        // Import Data functionality
-        document.getElementById('importBtn').addEventListener('click', function() {
-            const urlInput = document.getElementById('sheetUrl');
-            const url = urlInput.value.trim();
-            const statusDiv = document.getElementById('importStatus');
-            const btn = this;
+        // Dashboard functionality
+        function importData() {
+            const url = document.getElementById('sheets-url').value;
+            const mode = document.querySelector('input[name="import-mode"]:checked').value;
+            const status = document.getElementById('status-area');
             
             if (!url) {
-                showStatus(statusDiv, '❌ Por favor, insira um link válido', 'error');
+                status.value = '❌ Erro: Por favor, insira o link da planilha do Google Sheets.';
                 return;
             }
             
-            // Show loading
-            btn.innerHTML = '<span class="material-icons spinner">sync</span><span>IMPORTANDO...</span>';
-            btn.disabled = true;
-            
-            // Simulate import process
-            setTimeout(() => {
-                const isValidUrl = url.includes('docs.google.com/spreadsheets');
-                
-                if (isValidUrl && Math.random() > 0.3) {
-                    connectedSheetUrl = url;
-                    showStatus(statusDiv, '✅ Dados importados com sucesso!', 'success');
-                    updateConnectedSheet(url);
-                    btn.classList.add('pulse-success');
-                    setTimeout(() => btn.classList.remove('pulse-success'), 600);
+            // Convert Google Sheets URL to CSV export URL
+            let csvUrl;
+            try {
+                if (url.includes('/edit')) {
+                    // Extract sheet ID from URL
+                    const sheetId = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)[1];
+                    csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
                 } else {
-                    showStatus(statusDiv, '⚠️ Erro: verifique o link ou as permissões da planilha.', 'error');
+                    throw new Error('URL inválida');
                 }
-                
-                btn.innerHTML = '<span class="material-icons">download</span><span>IMPORTAR DADOS</span>';
-                btn.disabled = false;
-            }, 2000);
-        });
-
-        // Open Sheet functionality
-        document.getElementById('openSheetBtn').addEventListener('click', function() {
-            if (connectedSheetUrl) {
-                window.open(connectedSheetUrl, '_blank');
-            } else {
-                alert('Nenhuma planilha conectada. Importe dados primeiro.');
-            }
-        });
-
-        // Update Data functionality
-        document.getElementById('updateBtn').addEventListener('click', function() {
-            const statusDiv = document.getElementById('updateStatus');
-            const btn = this;
-            
-            if (!connectedSheetUrl) {
-                showStatus(statusDiv, '❌ Nenhuma planilha conectada', 'error');
+            } catch (error) {
+                status.value = '❌ Erro: URL da planilha inválida. Use o link completo do Google Sheets.';
                 return;
             }
             
-            btn.innerHTML = '<span class="material-icons spinner">sync</span><span>ATUALIZANDO...</span>';
-            btn.disabled = true;
+            status.value = '🔄 Iniciando importação dos dados...\n';
             
-            setTimeout(() => {
-                showStatus(statusDiv, '✅ Dados atualizados com sucesso!', 'success');
-                btn.innerHTML = '<span class="material-icons">sync</span><span>ATUALIZAR DADOS</span>';
-                btn.disabled = false;
-                btn.classList.add('pulse-success');
-                setTimeout(() => btn.classList.remove('pulse-success'), 600);
-            }, 1500);
-        });
+            // Fetch data from Google Sheets
+            fetch(csvUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Planilha não acessível ou sem permissão pública');
+                    }
+                    return response.text();
+                })
+                .then(csvData => {
+                    status.value += '✅ Conexão estabelecida com sucesso!\n';
+                    status.value += `📊 Modo: ${mode === 'replace' ? 'Substituir dados' : 'Adicionar dados'}\n`;
+                    
+                    // Parse CSV data
+                    const rows = csvData.split('\n').filter(row => row.trim());
+                    const headers = rows[0].split(',').map(h => h.replace(/"/g, '').trim());
+                    const dataRows = rows.slice(1);
+                    
+                    status.value += `📥 ${dataRows.length} linhas de dados encontradas\n`;
+                    
+                    // Update table
+                    updateTable(headers, dataRows, mode);
+                    
+                    status.value += '✅ Dados importados com sucesso!\n';
+                    status.value += '✨ Processo concluído.';
+                })
+                .catch(error => {
+                    status.value += `❌ Erro na importação: ${error.message}\n`;
+                    status.value += '💡 Verifique se a planilha tem permissão pública de visualização.';
+                });
+        }
 
-        // Test Connection functionality
-        document.getElementById('testBtn').addEventListener('click', function() {
-            const statusDiv = document.getElementById('testStatus');
-            const btn = this;
+        function updateTable(headers, dataRows, mode) {
+            const tableBody = document.getElementById('data-table');
             
-            btn.innerHTML = '<span class="material-icons spinner">sync</span><span>TESTANDO...</span>';
-            btn.disabled = true;
-            
-            setTimeout(() => {
-                const isConnected = connectedSheetUrl && Math.random() > 0.2;
-                
-                if (isConnected) {
-                    showStatus(statusDiv, '✅ Conexão válida com a planilha', 'success');
-                } else {
-                    showStatus(statusDiv, '❌ Não foi possível validar o link', 'error');
-                }
-                
-                btn.innerHTML = '<span class="material-icons">science</span><span>TESTAR CONEXÃO</span>';
-                btn.disabled = false;
-            }, 2000);
-        });
-
-        // Help toggle functionality
-        document.getElementById('helpToggle').addEventListener('click', function() {
-            const content = document.getElementById('helpContent');
-            const icon = document.getElementById('helpIcon');
-            
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                content.classList.add('fade-in');
-                icon.textContent = 'expand_less';
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                content.classList.add('hidden');
-                icon.textContent = 'expand_more';
-                icon.style.transform = 'rotate(0deg)';
+            if (mode === 'replace') {
+                // Clear existing data
+                tableBody.innerHTML = '';
             }
-        });
-
-        // Helper functions
-        function showStatus(element, message, type) {
-            element.className = mt-4 p-4 rounded-xl fade-in ${type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'};
-            element.textContent = message;
-            element.classList.remove('hidden');
-        }
-
-        function updateConnectedSheet(url) {
-            const connectedDiv = document.getElementById('connectedSheet');
-            const urlSpan = document.getElementById('connectedUrl');
             
-            const truncatedUrl = url.length > 50 ? url.substring(0, 50) + '...' : url;
-            urlSpan.textContent = truncatedUrl;
-            connectedDiv.classList.remove('hidden');
-            connectedDiv.classList.add('fade-in');
+            // Add new rows
+            dataRows.forEach(row => {
+                const cells = row.split(',').map(cell => cell.replace(/"/g, '').trim());
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50';
+                
+                cells.forEach((cell, index) => {
+                    const td = document.createElement('td');
+                    td.className = 'px-6 py-4 whitespace-nowrap text-sm';
+                    
+                    if (index === 0) {
+                        td.className += ' font-medium text-gray-900';
+                    } else if (index === 2) {
+                        // Style the value column
+                        if (cell.includes('R$')) {
+                            td.className += ' text-green-600 font-semibold';
+                        } else if (cell.includes('%')) {
+                            td.className += ' text-blue-600 font-semibold';
+                        } else if (cell.includes('/')) {
+                            td.className += ' text-purple-600 font-semibold';
+                        } else if (cell.includes('un.')) {
+                            td.className += ' text-orange-600 font-semibold';
+                        } else {
+                            td.className += ' text-gray-500';
+                        }
+                    } else {
+                        td.className += ' text-gray-500';
+                    }
+                    
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+                
+                tableBody.appendChild(tr);
+            });
         }
+
+        function updateData() {
+            const url = document.getElementById('sheets-url').value;
+            const status = document.getElementById('status-area');
+            
+            if (!url) {
+                status.value = '❌ Erro: Por favor, insira o link da planilha primeiro.';
+                return;
+            }
+            
+            status.value = '🔄 Atualizando dados da planilha...\n';
+            
+            // Re-import data
+            importData();
+        }
+
+        function testConnection() {
+            const url = document.getElementById('sheets-url').value;
+            const status = document.getElementById('status-area');
+            
+            if (!url) {
+                status.value = '❌ Erro: Por favor, insira o link da planilha.';
+                return;
+            }
+            
+            // Convert Google Sheets URL to CSV export URL
+            let csvUrl;
+            try {
+                if (url.includes('/edit')) {
+                    const sheetId = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)[1];
+                    csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+                } else {
+                    throw new Error('URL inválida');
+                }
+            } catch (error) {
+                status.value = '❌ Erro: URL da planilha inválida. Use o link completo do Google Sheets.';
+                return;
+            }
+            
+            status.value = '🧪 Testando conexão...\n';
+            
+            fetch(csvUrl, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        status.value += '✅ Conexão bem-sucedida!\n';
+                        status.value += '📋 Planilha acessível e com permissões adequadas.\n';
+                        status.value += '📊 Pronto para importar dados.';
+                    } else {
+                        throw new Error('Planilha não acessível');
+                    }
+                })
+                .catch(error => {
+                    status.value += '❌ Falha na conexão!\n';
+                    status.value += '💡 Verifique se a planilha tem permissão pública de visualização.\n';
+                    status.value += '🔗 Certifique-se de usar o link completo da planilha.';
+                });
+        }
+
+        function viewSheet() {
+            const url = document.getElementById('sheets-url').value;
+            const status = document.getElementById('status-area');
+            
+            if (!url) {
+                status.value = '❌ Erro: Por favor, insira o link da planilha.';
+                return;
+            }
+            
+            status.value = '🔍 Abrindo planilha em nova aba...';
+            window.open(url, '_blank');
+        }
+
+        // Source code functionality
+        function loadSourceCode() {
+            const sourceElement = document.getElementById('source-code');
+            const htmlContent = document.documentElement.outerHTML;
+            sourceElement.textContent = htmlContent;
+        }
+
+        function copyCode() {
+            const sourceCode = document.getElementById('source-code').textContent;
+            navigator.clipboard.writeText(sourceCode).then(() => {
+                // Show success feedback
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copiado!';
+                button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                button.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('bg-green-600');
+                    button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                }, 2000);
+            }).catch(() => {
+                alert('Erro ao copiar código. Tente selecionar e copiar manualmente.');
+            });
+        }
+
+        // Initialize status message
+        document.getElementById('status-area').value = '⏳ Aguardando ação do usuário...';
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'960540e45128f617',t:'MTc1MjcwODI3MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'960573e6336a4f83',t:'MTc1MjcxMDM2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
 
 </body><editor-card style="position:absolute;top:0px;left:0px;z-index:auto;display: block !important"><div dir="ltr" style="all: initial;"><div style="color-scheme: initial; forced-color-adjust: initial; mask: initial; math-depth: initial; position: absolute; position-anchor: initial; text-size-adjust: initial; appearance: initial; color: initial; font: initial; font-palette: initial; font-synthesis: initial; position-area: initial; text-orientation: initial; text-rendering: initial; text-spacing-trim: initial; -webkit-font-smoothing: initial; -webkit-locale: initial; -webkit-text-orientation: initial; -webkit-writing-mode: initial; writing-mode: initial; zoom: initial; accent-color: initial; place-content: initial; place-items: initial; place-self: initial; alignment-baseline: initial; anchor-name: initial; anchor-scope: initial; animation-composition: initial; animation: initial; app-region: initial; aspect-ratio: initial; backdrop-filter: initial; backface-visibility: initial; background: initial; background-blend-mode: initial; baseline-shift: initial; baseline-source: initial; block-size: initial; border-block: initial; border: initial; border-radius: initial; border-collapse: initial; border-end-end-radius: initial; border-end-start-radius: initial; border-inline: initial; border-start-end-radius: initial; border-start-start-radius: initial; inset: initial; box-decoration-break: initial; box-shadow: initial; box-sizing: initial; break-after: initial; break-before: initial; break-inside: initial; buffered-rendering: initial; caption-side: initial; caret-color: initial; clear: initial; clip: initial; clip-path: initial; clip-rule: initial; color-interpolation: initial; color-interpolation-filters: initial; color-rendering: initial; columns: initial; column-fill: initial; gap: initial; column-rule: initial; column-span: initial; contain: initial; contain-intrinsic-block-size: initial; contain-intrinsic-size: initial; contain-intrinsic-inline-size: initial; container: initial; content: initial; content-visibility: initial; counter-increment: initial; counter-reset: initial; counter-set: initial; cursor: initial; cx: initial; cy: initial; d: initial; display: initial; dominant-baseline: initial; dynamic-range-limit: initial; empty-cells: initial; field-sizing: initial; fill: initial; fill-opacity: initial; fill-rule: initial; filter: initial; flex: initial; flex-flow: initial; float: initial; flood-color: initial; flood-opacity: initial; grid: initial; grid-area: initial; height: initial; hyphenate-character: initial; hyphenate-limit-chars: initial; hyphens: initial; image-orientation: initial; image-rendering: initial; initial-letter: initial; inline-size: initial; inset-block: initial; inset-inline: initial; interpolate-size: initial; isolation: initial; letter-spacing: initial; lighting-color: initial; line-break: initial; list-style: initial; margin-block: initial; margin: initial; margin-inline: initial; marker: initial; mask-type: initial; math-shift: initial; math-style: initial; max-block-size: initial; max-height: initial; max-inline-size: initial; max-width: initial; min-block-size: initial; min-height: initial; min-inline-size: initial; min-width: initial; mix-blend-mode: initial; object-fit: initial; object-position: initial; object-view-box: initial; offset: initial; opacity: initial; order: initial; orphans: initial; outline: initial; outline-offset: initial; overflow-anchor: initial; overflow-block: initial; overflow-clip-margin: initial; overflow-inline: initial; overflow-wrap: initial; overflow: initial; overlay: initial; overscroll-behavior-block: initial; overscroll-behavior-inline: initial; overscroll-behavior: initial; padding-block: initial; padding: initial; padding-inline: initial; page: initial; page-orientation: initial; paint-order: initial; perspective: initial; perspective-origin: initial; pointer-events: initial; position-try: initial; position-visibility: initial; print-color-adjust: initial; quotes: initial; r: initial; reading-flow: initial; reading-order: initial; resize: initial; rotate: initial; ruby-align: initial; ruby-position: initial; rx: initial; ry: initial; scale: initial; scroll-behavior: initial; scroll-initial-target: initial; scroll-margin-block: initial; scroll-margin: initial; scroll-margin-inline: initial; scroll-marker-group: initial; scroll-padding-block: initial; scroll-padding: initial; scroll-padding-inline: initial; scroll-snap-align: initial; scroll-snap-stop: initial; scroll-snap-type: initial; scroll-timeline: initial; scrollbar-color: initial; scrollbar-gutter: initial; scrollbar-width: initial; shape-image-threshold: initial; shape-margin: initial; shape-outside: initial; shape-rendering: initial; size: initial; speak: initial; stop-color: initial; stop-opacity: initial; stroke: initial; stroke-dasharray: initial; stroke-dashoffset: initial; stroke-linecap: initial; stroke-linejoin: initial; stroke-miterlimit: initial; stroke-opacity: initial; stroke-width: initial; tab-size: initial; table-layout: initial; text-align: initial; text-align-last: initial; text-anchor: initial; text-box: initial; text-combine-upright: initial; text-decoration: initial; text-decoration-skip-ink: initial; text-emphasis: initial; text-emphasis-position: initial; text-indent: initial; text-overflow: initial; text-shadow: initial; text-transform: initial; text-underline-offset: initial; text-underline-position: initial; text-wrap: initial; timeline-scope: initial; touch-action: initial; transform: initial; transform-box: initial; transform-origin: initial; transform-style: initial; transition: initial; translate: initial; user-select: initial; vector-effect: initial; vertical-align: initial; view-timeline: initial; view-transition-class: initial; view-transition-name: initial; visibility: initial; border-spacing: initial; -webkit-box-align: initial; -webkit-box-decoration-break: initial; -webkit-box-direction: initial; -webkit-box-flex: initial; -webkit-box-ordinal-group: initial; -webkit-box-orient: initial; -webkit-box-pack: initial; -webkit-box-reflect: initial; -webkit-line-break: initial; -webkit-line-clamp: initial; -webkit-mask-box-image: initial; -webkit-rtl-ordering: initial; -webkit-ruby-position: initial; -webkit-tap-highlight-color: initial; -webkit-text-combine: initial; -webkit-text-decorations-in-effect: initial; -webkit-text-fill-color: initial; -webkit-text-security: initial; -webkit-text-stroke: initial; -webkit-user-drag: initial; white-space-collapse: initial; widows: initial; width: initial; will-change: initial; word-break: initial; word-spacing: initial; x: initial; y: initial; z-index: 2147483647;"><link rel="stylesheet" href="chrome-extension://gpaiobkfhnonedkhhfjpmhdalgeoebfa/fonts/fabric-icons.css"><div style="all: initial;"></div></div><div style="color-scheme: initial; forced-color-adjust: initial; mask: initial; math-depth: initial; position: absolute; position-anchor: initial; text-size-adjust: initial; appearance: initial; color: initial; font: initial; font-palette: initial; font-synthesis: initial; position-area: initial; text-orientation: initial; text-rendering: initial; text-spacing-trim: initial; -webkit-font-smoothing: initial; -webkit-locale: initial; -webkit-text-orientation: initial; -webkit-writing-mode: initial; writing-mode: initial; zoom: initial; accent-color: initial; place-content: initial; place-items: initial; place-self: initial; alignment-baseline: initial; anchor-name: initial; anchor-scope: initial; animation-composition: initial; animation: initial; app-region: initial; aspect-ratio: initial; backdrop-filter: initial; backface-visibility: initial; background: initial; background-blend-mode: initial; baseline-shift: initial; baseline-source: initial; block-size: initial; border-block: initial; border: initial; border-radius: initial; border-collapse: initial; border-end-end-radius: initial; border-end-start-radius: initial; border-inline: initial; border-start-end-radius: initial; border-start-start-radius: initial; inset: initial; box-decoration-break: initial; box-shadow: initial; box-sizing: initial; break-after: initial; break-before: initial; break-inside: initial; buffered-rendering: initial; caption-side: initial; caret-color: initial; clear: initial; clip: initial; clip-path: initial; clip-rule: initial; color-interpolation: initial; color-interpolation-filters: initial; color-rendering: initial; columns: initial; column-fill: initial; gap: initial; column-rule: initial; column-span: initial; contain: initial; contain-intrinsic-block-size: initial; contain-intrinsic-size: initial; contain-intrinsic-inline-size: initial; container: initial; content: initial; content-visibility: initial; counter-increment: initial; counter-reset: initial; counter-set: initial; cursor: initial; cx: initial; cy: initial; d: initial; display: initial; dominant-baseline: initial; dynamic-range-limit: initial; empty-cells: initial; field-sizing: initial; fill: initial; fill-opacity: initial; fill-rule: initial; filter: initial; flex: initial; flex-flow: initial; float: initial; flood-color: initial; flood-opacity: initial; grid: initial; grid-area: initial; height: initial; hyphenate-character: initial; hyphenate-limit-chars: initial; hyphens: initial; image-orientation: initial; image-rendering: initial; initial-letter: initial; inline-size: initial; inset-block: initial; inset-inline: initial; interpolate-size: initial; isolation: initial; letter-spacing: initial; lighting-color: initial; line-break: initial; list-style: initial; margin-block: initial; margin: initial; margin-inline: initial; marker: initial; mask-type: initial; math-shift: initial; math-style: initial; max-block-size: initial; max-height: initial; max-inline-size: initial; max-width: initial; min-block-size: initial; min-height: initial; min-inline-size: initial; min-width: initial; mix-blend-mode: initial; object-fit: initial; object-position: initial; object-view-box: initial; offset: initial; opacity: initial; order: initial; orphans: initial; outline: initial; outline-offset: initial; overflow-anchor: initial; overflow-block: initial; overflow-clip-margin: initial; overflow-inline: initial; overflow-wrap: initial; overflow: initial; overlay: initial; overscroll-behavior-block: initial; overscroll-behavior-inline: initial; overscroll-behavior: initial; padding-block: initial; padding: initial; padding-inline: initial; page: initial; page-orientation: initial; paint-order: initial; perspective: initial; perspective-origin: initial; pointer-events: initial; position-try: initial; position-visibility: initial; print-color-adjust: initial; quotes: initial; r: initial; reading-flow: initial; reading-order: initial; resize: initial; rotate: initial; ruby-align: initial; ruby-position: initial; rx: initial; ry: initial; scale: initial; scroll-behavior: initial; scroll-initial-target: initial; scroll-margin-block: initial; scroll-margin: initial; scroll-margin-inline: initial; scroll-marker-group: initial; scroll-padding-block: initial; scroll-padding: initial; scroll-padding-inline: initial; scroll-snap-align: initial; scroll-snap-stop: initial; scroll-snap-type: initial; scroll-timeline: initial; scrollbar-color: initial; scrollbar-gutter: initial; scrollbar-width: initial; shape-image-threshold: initial; shape-margin: initial; shape-outside: initial; shape-rendering: initial; size: initial; speak: initial; stop-color: initial; stop-opacity: initial; stroke: initial; stroke-dasharray: initial; stroke-dashoffset: initial; stroke-linecap: initial; stroke-linejoin: initial; stroke-miterlimit: initial; stroke-opacity: initial; stroke-width: initial; tab-size: initial; table-layout: initial; text-align: initial; text-align-last: initial; text-anchor: initial; text-box: initial; text-combine-upright: initial; text-decoration: initial; text-decoration-skip-ink: initial; text-emphasis: initial; text-emphasis-position: initial; text-indent: initial; text-overflow: initial; text-shadow: initial; text-transform: initial; text-underline-offset: initial; text-underline-position: initial; text-wrap: initial; timeline-scope: initial; touch-action: initial; transform: initial; transform-box: initial; transform-origin: initial; transform-style: initial; transition: initial; translate: initial; user-select: initial; vector-effect: initial; vertical-align: initial; view-timeline: initial; view-transition-class: initial; view-transition-name: initial; visibility: initial; border-spacing: initial; -webkit-box-align: initial; -webkit-box-decoration-break: initial; -webkit-box-direction: initial; -webkit-box-flex: initial; -webkit-box-ordinal-group: initial; -webkit-box-orient: initial; -webkit-box-pack: initial; -webkit-box-reflect: initial; -webkit-line-break: initial; -webkit-line-clamp: initial; -webkit-mask-box-image: initial; -webkit-rtl-ordering: initial; -webkit-ruby-position: initial; -webkit-tap-highlight-color: initial; -webkit-text-combine: initial; -webkit-text-decorations-in-effect: initial; -webkit-text-fill-color: initial; -webkit-text-security: initial; -webkit-text-stroke: initial; -webkit-user-drag: initial; white-space-collapse: initial; widows: initial; width: initial; will-change: initial; word-break: initial; word-spacing: initial; x: initial; y: initial; z-index: 2147483647;"><link rel="stylesheet" href="chrome-extension://gpaiobkfhnonedkhhfjpmhdalgeoebfa/fonts/fabric-icons.css"></div></div></editor-card></html>
