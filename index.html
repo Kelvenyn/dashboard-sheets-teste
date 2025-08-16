@@ -7,21 +7,17 @@
   <meta name="theme-color" content="#0ea5e9" />
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root { color-scheme: light dark; }
     body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
-    .glass { backdrop-filter: blur(8px); background: rgba(255,255,255,0.7); }
-    @media (prefers-color-scheme: dark){ .glass{ background: rgba(17,24,39,0.6);} }
   </style>
-  
-  <!-- PDF.js (usar o viewer embutido via iframe) -->
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+
+  <!-- PDF.js (somente para o FLIPBOOK / render local) -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
 
-  <!-- StPageFlip (Flipbook) -->
+  <!-- StPageFlip (efeito virar página) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/stpageflip@2.0.7/dist/css/page-flip.min.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/stpageflip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 </head>
@@ -34,7 +30,7 @@
       </div>
       <div class="flex-1">
         <h1 class="text-lg sm:text-xl font-bold">Antigo Testamento – Área de Leitura</h1>
-        <p class="text-slate-500 text-sm">Escolha o modo: Leitor moderno ou Flipbook</p>
+        <p class="text-slate-500 text-sm">Modo Leitor (Google Drive) e modo Flipbook</p>
       </div>
       <a href="https://wa.me/5579981373200" target="_blank" class="px-3 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold shadow">Suporte WhatsApp</a>
     </div>
@@ -48,35 +44,54 @@
     </div>
 
     <!-- Aviso Drive -->
-    <div class="mt-4 text-xs text-slate-500">
-      <p>
-        Fonte: Google Drive. Para máxima performance (carregamento por página e cache de CDN), considere mover para S3/Cloudflare R2 depois. 
-      </p>
+    <div class="mt-4 text-xs text-slate-500 space-y-1">
+      <p>Fonte atual: <b>Google Drive</b>. Para arquivos muito grandes, o Drive pode bloquear downloads diretos por segurança (sem CORS), o que quebra o PDF.js e gera <code>Failed to fetch</code>.</p>
+      <p>✅ Corrigido: o <b>Modo Leitor</b> agora usa o <em>preview</em> oficial do Drive e funciona mesmo com arquivos grandes.</p>
+      <p>ℹ️ O <b>Flipbook</b> precisa que o PDF esteja em servidor com CORS (ex.: S3/Cloudflare R2). Incluímos um <b>teste de exemplo</b> e opção de URL própria.</p>
     </div>
 
-    <!-- Panels -->
+    <!-- PANELS -->
     <section id="panelReader" class="mt-6">
       <div class="rounded-2xl overflow-hidden ring-1 ring-slate-200 dark:ring-slate-800 shadow-lg">
-        <!-- PDF.js Web Viewer via iframe -->
-        <iframe id="pdfIframe" title="Leitor PDF" class="w-full" style="height: calc(100vh - 180px);" allow="clipboard-read; clipboard-write"
-          src="about:blank"></iframe>
+        <!-- Drive Preview embutido (funciona sem CORS) -->
+        <iframe id="drivePreview" title="Leitor PDF (Drive)" class="w-full" style="height: calc(100vh - 180px);" allow="fullscreen" referrerpolicy="no-referrer"></iframe>
+      </div>
+      <div class="flex items-center justify-between mt-3 text-xs text-slate-500">
+        <span>Se preferir, abra em nova aba.</span>
+        <div class="space-x-2">
+          <a id="openPreview" target="_blank" class="underline">Abrir preview</a>
+          <a id="openDownload" target="_blank" class="underline">Baixar (se permitido)</a>
+        </div>
       </div>
     </section>
 
     <section id="panelFlip" class="mt-6 hidden">
       <div class="rounded-2xl ring-1 ring-slate-200 dark:ring-slate-800 shadow-lg p-4 sm:p-6 bg-white dark:bg-slate-900">
-        <div class="flex items-center justify-between flex-wrap gap-3">
+        <!-- Seletor de fonte para o Flipbook -->
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-sm text-slate-600 dark:text-slate-300">Fonte do PDF para o Flipbook:</span>
+          <button id="useDemo" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">Usar DEMO (teste)</button>
+          <button id="useDrive" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">Tentar Google Drive</button>
+          <div class="flex items-center gap-2 text-sm">
+            <input id="customUrl" type="url" placeholder="Cole uma URL direta (CORS liberado)" class="w-[320px] max-w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"/>
+            <button id="useCustom" class="px-3 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold">Usar URL</button>
+          </div>
+        </div>
+
+        <p class="mt-3 text-xs text-slate-500" id="flipHint">Dica: para usar seu PDF gigante no flipbook, hospede em S3/R2 com CORS e copie a URL. Com Drive, pode falhar.</p>
+
+        <div class="flex items-center justify-between flex-wrap gap-3 mt-4">
           <div class="flex items-center gap-3">
             <button id="btnPrev" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">← Anterior</button>
             <button id="btnNext" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">Próxima →</button>
           </div>
-          <div class="text-sm text-slate-500" id="flipInfo">Carregando páginas…</div>
+          <div class="text-sm text-slate-500" id="flipInfo">Selecione uma fonte para iniciar…</div>
         </div>
 
         <div id="flipContainer" class="mt-4 mx-auto" style="width: min(100%, 900px); height: min(80vh, 1200px);"></div>
 
         <div class="mt-4 flex items-center justify-between">
-          <button id="btnLoadMore" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold disabled:opacity-50">Carregar mais páginas</button>
+          <button id="btnLoadMore" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold disabled:opacity-50" disabled>Carregar mais páginas</button>
           <label class="text-sm flex items-center gap-2"><input id="chkRetina" type="checkbox" class="accent-sky-500" checked> Qualidade alta</label>
         </div>
       </div>
@@ -88,10 +103,13 @@
   </footer>
 
   <script>
-    // ====== CONFIGURAÇÃO ======
+    // ====== CONFIGURAÇÕES ======
     const DRIVE_FILE_ID = '1rnK1TAJDXbKqFrjQLsYam90r170sBqDD';
-    // Link de download direto do Google Drive
-    const PDF_URL = `https://drive.google.com/uc?export=download&id=${DRIVE_FILE_ID}`;
+    const DRIVE_PREVIEW_URL = `https://drive.google.com/file/d/${DRIVE_FILE_ID}/preview`;
+    const DRIVE_DOWNLOAD_URL = `https://drive.google.com/uc?export=download&id=${DRIVE_FILE_ID}`; // pode exigir confirmação em arquivos grandes
+
+    // PDF DEMO (CORS liberado) – usado como "teste automático" do flipbook
+    const DEMO_PDF_URL = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
 
     // ====== TABS ======
     const tabReader = document.getElementById('tabReader');
@@ -116,17 +134,18 @@
         panelReader.classList.add('hidden');
       }
     }
-
     tabReader.addEventListener('click', ()=>activate('reader'));
     tabFlip.addEventListener('click', ()=>activate('flip'));
 
-    // ====== PDF.js Web Viewer via IFRAME ======
-    const iframe = document.getElementById('pdfIframe');
-    const viewerBase = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/web/viewer.html';
-    const encoded = encodeURIComponent(PDF_URL);
-    iframe.src = `${viewerBase}?file=${encoded}#zoom=page-width`; // modo leitura
+    // ====== MODO LEITOR (Drive Preview) ======
+    const preview = document.getElementById('drivePreview');
+    const openPreview = document.getElementById('openPreview');
+    const openDownload = document.getElementById('openDownload');
+    preview.src = DRIVE_PREVIEW_URL + '#zoom=page-fit';
+    openPreview.href = `https://drive.google.com/file/d/${DRIVE_FILE_ID}/view`;
+    openDownload.href = DRIVE_DOWNLOAD_URL;
 
-    // ====== Flipbook (render progressivo) ======
+    // ====== MODO FLIPBOOK ======
     const flipContainer = document.getElementById('flipContainer');
     const btnPrev = document.getElementById('btnPrev');
     const btnNext = document.getElementById('btnNext');
@@ -134,48 +153,48 @@
     const chkRetina = document.getElementById('chkRetina');
     const flipInfo = document.getElementById('flipInfo');
 
+    // Seletor de fonte
+    const useDemo = document.getElementById('useDemo');
+    const useDrive = document.getElementById('useDrive');
+    const useCustom = document.getElementById('useCustom');
+    const customUrl = document.getElementById('customUrl');
+
     let pdfDoc = null;
     let pageCount = 0;
     let loadedPages = 0;
     let flip = null;
     const BATCH_SIZE = 12; // carrega 12 páginas por vez
 
-    // Inicializa PDF.js
-    document.addEventListener('DOMContentLoaded', async () => {
+    function resetFlip(){
+      loadedPages = 0;
+      pageCount = 0;
+      flip?.destroy();
+      flip = new St.PageFlip(flipContainer, {
+        width: 900, height: 1200,
+        size: 'stretch', usePortrait: true,
+        maxShadowOpacity: 0.3, mobileScrollSupport: true
+      });
+      flipInfo.textContent = 'Preparando…';
+      btnLoadMore.disabled = true;
+    }
+
+    async function initFlipbookFrom(url){
       try {
-        // Força o worker em CDN (alguns hosts bloqueiam import de worker local)
+        resetFlip();
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        pdfDoc = await pdfjsLib.getDocument({ url: PDF_URL, withCredentials: false }).promise;
+        const task = pdfjsLib.getDocument({ url });
+        pdfDoc = await task.promise; // "Failed to fetch" aqui quando CORS/Drive bloqueia
         pageCount = pdfDoc.numPages;
         flipInfo.textContent = `Páginas: ${pageCount}. Renderizando primeiras ${BATCH_SIZE}…`;
-
-        // Instancia o flipbook
-        flip = new St.PageFlip(flipContainer, {
-          width: 900, height: 1200, // será ajustado via CSS container
-          size: 'stretch',
-          maxShadowOpacity: 0.3,
-          showCover: false,
-          mobileScrollSupport: true,
-          usePortrait: true,
-        });
-
-        flip.on('flip', (e) => {
-          // Pré-carrega mais quando aproxima do fim
-          if (loadedPages - e.data <= 4 && loadedPages < pageCount) {
-            queueBatch();
-          }
-        });
-
-        // Renderiza lote inicial
         await queueBatch();
-
       } catch (err) {
         console.error(err);
-        flipInfo.textContent = 'Falha ao carregar do Google Drive. Se o arquivo for muito grande, o Drive pode exigir confirmação. Em produção, prefira armazenar em S3/Cloudflare R2.';
+        flipInfo.textContent = 'Não foi possível carregar este PDF diretamente. Se ele está no Google Drive e é muito grande, o acesso direto é bloqueado. Hospede em S3/Cloudflare R2 (CORS) ou use a opção DEMO/URL.';
       }
-    });
+    }
 
     async function queueBatch(){
+      if(!pdfDoc) return;
       const end = Math.min(loadedPages + BATCH_SIZE, pageCount);
       btnLoadMore.disabled = true;
       for(let i = loadedPages + 1; i <= end; i++){
@@ -188,44 +207,33 @@
         await page.render({ canvasContext: context, viewport }).promise;
         const dataURL = canvas.toDataURL('image/jpeg', 0.92);
 
-        // adiciona página ao flipbook
         const pageElem = document.createElement('div');
         pageElem.className = 'page bg-white dark:bg-slate-900';
         const img = document.createElement('img');
-        img.src = dataURL;
-        img.alt = `Página ${i}`;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'contain';
+        img.src = dataURL; img.alt = `Página ${i}`;
+        img.style.width = '100%'; img.style.height = '100%'; img.style.objectFit = 'contain';
         pageElem.appendChild(img);
 
-        if(loadedPages === 0){
-          flip.loadFromHTML([pageElem]);
-        } else {
-          flip.addPage(pageElem);
-        }
-        loadedPages = i;
-        flipInfo.textContent = `Páginas carregadas: ${loadedPages}/${pageCount}`;
+        if(loadedPages === 0){ flip.loadFromHTML([pageElem]); } else { flip.addPage(pageElem); }
+        loadedPages = i; flipInfo.textContent = `Páginas carregadas: ${loadedPages}/${pageCount}`;
       }
-      if (loadedPages < pageCount) {
-        btnLoadMore.disabled = false;
-        btnLoadMore.textContent = 'Carregar mais páginas';
-      } else {
-        btnLoadMore.disabled = true;
-        btnLoadMore.textContent = 'Todas as páginas carregadas';
-      }
+      btnLoadMore.disabled = loadedPages >= pageCount;
+      btnLoadMore.textContent = loadedPages >= pageCount ? 'Todas as páginas carregadas' : 'Carregar mais páginas';
     }
 
+    // Controles
     btnPrev.addEventListener('click', ()=> flip?.flipPrev());
     btnNext.addEventListener('click', ()=> flip?.flipNext());
     btnLoadMore.addEventListener('click', queueBatch);
-    chkRetina.addEventListener('change', ()=>{
-      // Reinicia render para aplicar qualidade
-      if(!pdfDoc) return;
-      loadedPages = 0;
-      flip?.destroy();
-      flip = new St.PageFlip(flipContainer, { width: 900, height: 1200, size: 'stretch', usePortrait: true, maxShadowOpacity: 0.3, mobileScrollSupport: true });
-      queueBatch();
+    chkRetina.addEventListener('change', ()=>{ if(pdfDoc){ initFlipbookFrom(currentURL); } });
+
+    let currentURL = null;
+    useDemo.addEventListener('click', ()=>{ currentURL = DEMO_PDF_URL; initFlipbookFrom(currentURL); btnLoadMore.disabled = false; });
+    useDrive.addEventListener('click', ()=>{ currentURL = DRIVE_DOWNLOAD_URL; initFlipbookFrom(currentURL); /* pode falhar em arquivos grandes (Drive) */ });
+    useCustom.addEventListener('click', ()=>{
+      const url = (customUrl.value || '').trim();
+      if(!url) { flipInfo.textContent = 'Informe uma URL direta para o PDF.'; return; }
+      currentURL = url; initFlipbookFrom(currentURL); btnLoadMore.disabled = false;
     });
 
     // Ano rodapé
