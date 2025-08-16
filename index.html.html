@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leitor do Antigo Testamento – Área de Membros</title>
+  <meta name="theme-color" content="#0ea5e9" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    .glass { backdrop-filter: blur(8px); background: rgba(255,255,255,0.7); }
+    @media (prefers-color-scheme: dark){ .glass{ background: rgba(17,24,39,0.6);} }
+  </style>
+  
+  <!-- PDF.js (usar o viewer embutido via iframe) -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+
+  <!-- StPageFlip (Flipbook) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/stpageflip@2.0.7/dist/css/page-flip.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/stpageflip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
+  <!-- Header -->
+  <header class="sticky top-0 z-30 border-b border-slate-200/70 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-sky-500/10 flex items-center justify-center ring-1 ring-sky-400/30">
+        <span class="text-sky-600 font-extrabold">AT</span>
+      </div>
+      <div class="flex-1">
+        <h1 class="text-lg sm:text-xl font-bold">Antigo Testamento – Área de Leitura</h1>
+        <p class="text-slate-500 text-sm">Escolha o modo: Leitor moderno ou Flipbook</p>
+      </div>
+      <a href="https://wa.me/5579981373200" target="_blank" class="px-3 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold shadow">Suporte WhatsApp</a>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <div class="inline-flex rounded-2xl p-1 bg-slate-100 dark:bg-slate-800 shadow-sm">
+      <button id="tabReader" class="px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-slate-900 shadow">📖 Leitor</button>
+      <button id="tabFlip" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300">📚 Flipbook</button>
+    </div>
+
+    <!-- Aviso Drive -->
+    <div class="mt-4 text-xs text-slate-500">
+      <p>
+        Fonte: Google Drive. Para máxima performance (carregamento por página e cache de CDN), considere mover para S3/Cloudflare R2 depois. 
+      </p>
+    </div>
+
+    <!-- Panels -->
+    <section id="panelReader" class="mt-6">
+      <div class="rounded-2xl overflow-hidden ring-1 ring-slate-200 dark:ring-slate-800 shadow-lg">
+        <!-- PDF.js Web Viewer via iframe -->
+        <iframe id="pdfIframe" title="Leitor PDF" class="w-full" style="height: calc(100vh - 180px);" allow="clipboard-read; clipboard-write"
+          src="about:blank"></iframe>
+      </div>
+    </section>
+
+    <section id="panelFlip" class="mt-6 hidden">
+      <div class="rounded-2xl ring-1 ring-slate-200 dark:ring-slate-800 shadow-lg p-4 sm:p-6 bg-white dark:bg-slate-900">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <button id="btnPrev" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">← Anterior</button>
+            <button id="btnNext" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">Próxima →</button>
+          </div>
+          <div class="text-sm text-slate-500" id="flipInfo">Carregando páginas…</div>
+        </div>
+
+        <div id="flipContainer" class="mt-4 mx-auto" style="width: min(100%, 900px); height: min(80vh, 1200px);"></div>
+
+        <div class="mt-4 flex items-center justify-between">
+          <button id="btnLoadMore" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold disabled:opacity-50">Carregar mais páginas</button>
+          <label class="text-sm flex items-center gap-2"><input id="chkRetina" type="checkbox" class="accent-sky-500" checked> Qualidade alta</label>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-10 text-center text-xs text-slate-500">
+    © <span id="year"></span> Kelvenyn – Leitor do Antigo Testamento. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    // ====== CONFIGURAÇÃO ======
+    const DRIVE_FILE_ID = '1rnK1TAJDXbKqFrjQLsYam90r170sBqDD';
+    // Link de download direto do Google Drive
+    const PDF_URL = `https://drive.google.com/uc?export=download&id=${DRIVE_FILE_ID}`;
+
+    // ====== TABS ======
+    const tabReader = document.getElementById('tabReader');
+    const tabFlip   = document.getElementById('tabFlip');
+    const panelReader = document.getElementById('panelReader');
+    const panelFlip   = document.getElementById('panelFlip');
+
+    function activate(tab){
+      if(tab === 'reader'){
+        tabReader.classList.add('bg-white','dark:bg-slate-900','shadow');
+        tabReader.classList.remove('text-slate-600','dark:text-slate-300');
+        tabFlip.classList.remove('bg-white','dark:bg-slate-900','shadow');
+        tabFlip.classList.add('text-slate-600','dark:text-slate-300');
+        panelReader.classList.remove('hidden');
+        panelFlip.classList.add('hidden');
+      } else {
+        tabFlip.classList.add('bg-white','dark:bg-slate-900','shadow');
+        tabFlip.classList.remove('text-slate-600','dark:text-slate-300');
+        tabReader.classList.remove('bg-white','dark:bg-slate-900','shadow');
+        tabReader.classList.add('text-slate-600','dark:text-slate-300');
+        panelFlip.classList.remove('hidden');
+        panelReader.classList.add('hidden');
+      }
+    }
+
+    tabReader.addEventListener('click', ()=>activate('reader'));
+    tabFlip.addEventListener('click', ()=>activate('flip'));
+
+    // ====== PDF.js Web Viewer via IFRAME ======
+    const iframe = document.getElementById('pdfIframe');
+    const viewerBase = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/web/viewer.html';
+    const encoded = encodeURIComponent(PDF_URL);
+    iframe.src = `${viewerBase}?file=${encoded}#zoom=page-width`; // modo leitura
+
+    // ====== Flipbook (render progressivo) ======
+    const flipContainer = document.getElementById('flipContainer');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const btnLoadMore = document.getElementById('btnLoadMore');
+    const chkRetina = document.getElementById('chkRetina');
+    const flipInfo = document.getElementById('flipInfo');
+
+    let pdfDoc = null;
+    let pageCount = 0;
+    let loadedPages = 0;
+    let flip = null;
+    const BATCH_SIZE = 12; // carrega 12 páginas por vez
+
+    // Inicializa PDF.js
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Força o worker em CDN (alguns hosts bloqueiam import de worker local)
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        pdfDoc = await pdfjsLib.getDocument({ url: PDF_URL, withCredentials: false }).promise;
+        pageCount = pdfDoc.numPages;
+        flipInfo.textContent = `Páginas: ${pageCount}. Renderizando primeiras ${BATCH_SIZE}…`;
+
+        // Instancia o flipbook
+        flip = new St.PageFlip(flipContainer, {
+          width: 900, height: 1200, // será ajustado via CSS container
+          size: 'stretch',
+          maxShadowOpacity: 0.3,
+          showCover: false,
+          mobileScrollSupport: true,
+          usePortrait: true,
+        });
+
+        flip.on('flip', (e) => {
+          // Pré-carrega mais quando aproxima do fim
+          if (loadedPages - e.data <= 4 && loadedPages < pageCount) {
+            queueBatch();
+          }
+        });
+
+        // Renderiza lote inicial
+        await queueBatch();
+
+      } catch (err) {
+        console.error(err);
+        flipInfo.textContent = 'Falha ao carregar do Google Drive. Se o arquivo for muito grande, o Drive pode exigir confirmação. Em produção, prefira armazenar em S3/Cloudflare R2.';
+      }
+    });
+
+    async function queueBatch(){
+      const end = Math.min(loadedPages + BATCH_SIZE, pageCount);
+      btnLoadMore.disabled = true;
+      for(let i = loadedPages + 1; i <= end; i++){
+        const page = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale: chkRetina.checked ? 1.8 : 1.2 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+        await page.render({ canvasContext: context, viewport }).promise;
+        const dataURL = canvas.toDataURL('image/jpeg', 0.92);
+
+        // adiciona página ao flipbook
+        const pageElem = document.createElement('div');
+        pageElem.className = 'page bg-white dark:bg-slate-900';
+        const img = document.createElement('img');
+        img.src = dataURL;
+        img.alt = `Página ${i}`;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        pageElem.appendChild(img);
+
+        if(loadedPages === 0){
+          flip.loadFromHTML([pageElem]);
+        } else {
+          flip.addPage(pageElem);
+        }
+        loadedPages = i;
+        flipInfo.textContent = `Páginas carregadas: ${loadedPages}/${pageCount}`;
+      }
+      if (loadedPages < pageCount) {
+        btnLoadMore.disabled = false;
+        btnLoadMore.textContent = 'Carregar mais páginas';
+      } else {
+        btnLoadMore.disabled = true;
+        btnLoadMore.textContent = 'Todas as páginas carregadas';
+      }
+    }
+
+    btnPrev.addEventListener('click', ()=> flip?.flipPrev());
+    btnNext.addEventListener('click', ()=> flip?.flipNext());
+    btnLoadMore.addEventListener('click', queueBatch);
+    chkRetina.addEventListener('change', ()=>{
+      // Reinicia render para aplicar qualidade
+      if(!pdfDoc) return;
+      loadedPages = 0;
+      flip?.destroy();
+      flip = new St.PageFlip(flipContainer, { width: 900, height: 1200, size: 'stretch', usePortrait: true, maxShadowOpacity: 0.3, mobileScrollSupport: true });
+      queueBatch();
+    });
+
+    // Ano rodapé
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
